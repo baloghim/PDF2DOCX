@@ -2,10 +2,12 @@
 import argparse
 import hashlib
 import json
+import os
 from pathlib import Path
 import shutil
 import subprocess
 import sys
+import traceback
 import urllib.request
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -68,6 +70,7 @@ def assemble(prefix, caches):
 
 def archive():
     folder = ROOT / 'dist' / 'PDF2DOCX'
+    (folder / 'BUILD-INFO.json').write_text(json.dumps({'source_commit': os.environ.get('GITHUB_SHA'), 'target': 'Windows x64', 'windows_1607_verified': False}, indent=2), encoding='utf-8')
     for filename in ('README.md',):
         shutil.copy2(ROOT / filename, folder / filename)
     shutil.copy2(ROOT / 'packaging' / 'README.md', folder / 'WINDOWS-KIADAS.md')
@@ -102,4 +105,12 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except Exception:
+        # This build uses only public dependencies, no user documents or secrets.
+        summary = os.environ.get('GITHUB_STEP_SUMMARY')
+        if summary:
+            with open(summary, 'a', encoding='utf-8') as report:
+                report.write('## Windows packaging failure\n\n```text\n' + traceback.format_exc() + '\n```\n')
+        raise
