@@ -48,7 +48,8 @@ válassz megfelelő licencelési módot; ez a projekt nem ad automatikus felment
 Tesseract és tessdata: Apache-2.0; a DLL-függőségeknek külön licenceik lehetnek.
 Python, Tcl/Tk, TkDnD, python-docx (MIT), Pillow (HPND), lxml (BSD és natív
 függőségek), PyInstaller (GPL bootloader kivétellel) licencanyagait is meg kell őrizni.
-A kész bináris leltára és licenccsomagja külön ellenőrzendő; itt nincs kész terjesztés.
+A ZIP a felhasznált conda-csomagok leltárát, az érintett natív könyvtárak,
+a Python/Tcl/Tk és a Python-csomagok licencanyagait is tartalmazza.
 Források: https://pymupdf.readthedocs.io/en/latest/about.html ,
 https://github.com/tesseract-ocr/tesseract , https://github.com/tesseract-ocr/tessdata_fast ,
 https://pyinstaller.org/en/v6.10.0/usage.html , https://www.python.org/downloads/windows/ .
@@ -70,6 +71,6 @@ a magyar OCR-t. Ekkor a fejlesztői Python/OCR elérési útjai nem használhat�
 Csak sikeres build és tesztek után kerülnek a fájlok a `windows-preview`
 előzetes GitHub Release mellékletei közé. A README állandó letöltési linkje ide mutat.
 A build workflow tokenjének `contents: write` jogosultság szükséges a kiadási jobban.
-Az első sikeres futásig a letöltési link még nem él. A Windows Server 2022 teszt
-nem helyettesíti a kötelező Windows 1607 célgépes tesztet; ezt a kiadás előzetes
-jelölése is tükrözi. A GitHub workflow ebben a Linux-feladatban még nem futott le.
+A [Windows build és közzététel sikeresen lefutott](https://github.com/baloghim/PDF2DOCX/actions/runs/40654527102);
+a ZIP a README-ből letölthető. A Windows Server 2022 teszt nem helyettesíti
+a kötelező Windows 1607 célgépes tesztet; ezt a kiadás előzetes jelölése is tükrözi.

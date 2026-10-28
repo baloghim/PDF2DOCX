@@ -4,7 +4,7 @@
 
 **[PDF2DOCX Windows x64 ZIP letöltése](https://github.com/baloghim/PDF2DOCX/releases/download/windows-preview/PDF2DOCX-Windows-x64.zip)**
 
-A link az első sikeres Windows build és közzététel után válik elérhetővé.
+A teljes, OCR-motort és magyar nyelvi adatokat is tartalmazó csomag körülbelül **57 MB**.
 Állapot: [Windows ZIP build](https://github.com/baloghim/PDF2DOCX/actions/workflows/windows-release.yml).
 
 1. Töltse le a ZIP-et és bontsa ki a **teljes** tartalmát egy írható mappába.
@@ -102,14 +102,17 @@ megszakítás és Tcl-fájllista szerepelnek a tesztek között.
 A szintetikus, jó minőségű magyar OCR-mintán a `hun` és `hun+eng` eredményét
 azonos referenciaszöveghez hasonlítjuk; ez nem reprezentatív hivatalos iratkorpusz.
 
-**Állapot:** fejlesztői változat. Linux/Python 3.11 alatt tesztelt motor.
+**Állapot:** letölthető Windows x64 előzetes kiadás. Linux/Python 3.11 alatt is tesztelt motor.
 A virtuális Linux kijelzőn a GUI munkafolyamata tesztelt. A TkDnD natív betöltése
 a hordozható Linux Tcl környezetben nem működött, ezért Linuxon kizárólag
 a kattintásos fájlválasztó aktív. A drag-and-drop natív része Windowsra korlátozott;
 a fájllista és drop-esemény kezelése automatikusan tesztelt.
-A Windows EXE, az Intézőből történő drag-and-drop és a kötelező Windows 10 Enterprise
-2016 LTSB 1607 build 14393.9512 kompatibilitási teszt nincs igazolva.
-A rögzített verziók jelöltek a Windows kiadáshoz, nem bizonyítottan kompatibilisek.
+A [sikeres Windows Server 2022 buildben](https://github.com/baloghim/PDF2DOCX/actions/runs/40654527102)
+16 automatizált teszt, valamint a ZIP-ből kibontott EXE natív TkDnD-, digitális PDF-
+és magyar OCR-ellenőrzése is sikerült.
+Az Intézőből történő tényleges behúzás kézi tesztje és a Windows 10 Enterprise
+2016 LTSB 1607 build 14393.9512 kompatibilitási teszt továbbra is hátravan.
+A Windows Server 2022 eredménye nem igazolja a Windows 1607 kompatibilitását.
 A Windows kiadási ellenőrzőlista és a licenckövetelmények a csomagolási leírásban vannak.
 
 A jelenlegi felhőkörnyezetben a teljes GUI-teszt virtuális kijelzővel:
