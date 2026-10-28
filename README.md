@@ -66,15 +66,25 @@ A Windows build leírása: [packaging/README.md](packaging/README.md).
   szótáras javítás vagy generatív AI. Az eredményt mindig össze kell vetni az eredetivel.
 - Közeli sorok blokkon belül összeolvadnak; nagyobb térköz, címsor vagy listajel új
   bekezdés. A literális kötőjelek megmaradnak; csak explicit lágy elválasztás egyesül.
-- Nagyobb betűs címek, félkövér/dőlt szakaszok, egyszerű rácsos táblák és kis raszteres
-  képek támogatottak. Nincs minden sorhoz szövegdoboz vagy teljes oldalas kép.
-- Számozás és listajel szerkeszthető szövegként marad meg, nem Word automatikus lista.
-- Összetett hasábok, elforgatott oldal, kézírás, nehéz szkennelés, vektoros logók,
-  oldaltörések és képek pontos helye nem rekonstruált. A táblák az oldal szövege után
-  következnek; összetett olvasási sorrendhez kézi javítás kell.
+- A 0.2.0 változat átveszi a PDF betűméreteit, a szokásos betűcsaládok megfelelőjét,
+  a félkövér/dőlt kiemeléseket, színeket és felső indexeket. A középre, jobbra,
+  balra és sorkizártan igazított bekezdéseket geometriai heurisztikákkal ismeri fel.
+- A behúzások, első sorok, sorközök, bekezdésközök, rövid címzésblokkok sortörései,
+  oldalméretek és a PDF-oldalak közötti törések megmaradnak. Normál Word-bekezdések
+  készülnek; nincsenek soronkénti szövegdobozok vagy a szöveget helyettesítő oldalképek.
+- A számozott és pontozott listák Word-listaként készülnek, a forrás kezdőszámával.
+  Az egyéb listajelek és összetett számozások szövegként maradnak meg.
+- Az egyszerű rácsos táblák a megfelelő helyre kerülnek, oszlopszélességükkel együtt.
+  A kis raszteres képek, logók a szöveghez viszonyított sorrendet és méretet követik.
+- Az OCR is felhasználja a felismert sorok és szavak helyét: igazítást, behúzást,
+  térközt és becsült betűméretet állít vissza. A szkennelt képből a betűcsalád,
+  félkövér/dőlt kiemelés és táblázatszerkezet jelenleg nem állítható vissza megbízhatóan.
+- A formázás helyreállítása heurisztikus. Összetett hasábok, fejlécek/láblécek,
+  vektoros grafikák, szegélyek és összetett táblák további kézi javítást igényelhetnek.
+  A PDF-től eltérő Word-fontmetrikák miatt a tördelés és oldalszám eltérhet.
 - Szöveges oldalon a legalább 25% oldalterületű, meglévő szöveggel nem átfedő képek
-  külön OCR-t kapnak. Az eredmény az oldal szövege után kerül; az átfedő vagy kisebb
-  képekben lévő további szöveg kimaradhat. A vegyes oldalakat tartalmazó PDF támogatott. Üres/szöveg nélkül maradó OCR-oldal hibát jelez; nem hagyja ki csendben.
+  külön OCR-t kapnak. Az átfedő vagy kisebb képekben lévő további szöveg kimaradhat.
+  Üres/szöveg nélkül maradó OCR-oldal hibát jelez; nem hagyja ki csendben.
 - A DOCX visszanyitása szerkezeti ellenőrzés, nem igazolja a szöveg pontosságát.
 - Egy OCR-hívás 180 másodperc után leáll. Nagy PDF feldolgozása memóriaigényes lehet;
   a Word-modell a feldolgozás végéig memóriában marad.

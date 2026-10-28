@@ -1,4 +1,3 @@
-import io
 import os
 from pathlib import Path
 import tempfile
@@ -10,6 +9,7 @@ from docx.shared import Cm, Pt
 from .extract import extract, usable
 from .model import ConversionError, Cancelled
 from .ocr import Tesseract
+from .builder import append_page
 
 
 @dataclass
@@ -98,24 +98,7 @@ def convert(source, *, overwrite=False, progress=lambda *args: None, cancel=None
                     model = ocr.recognize(page, cancel)
                 ocr_count += model.ocr
                 uncertain += model.uncertain_words
-                for paragraph in model.paragraphs:
-                    p = doc.add_paragraph(style='Heading 1' if paragraph.heading else None)
-                    # Preserve source numbering literally, avoiding automatic renumbering.
-                    if paragraph.list_item:
-                        p.paragraph_format.left_indent = Cm(.5)
-                        p.paragraph_format.first_line_indent = Cm(-.5)
-                    for span in paragraph.runs:
-                        r = p.add_run(span.text)
-                        r.bold, r.italic = span.bold, span.italic
-                for rows in model.tables:
-                    table = doc.add_table(rows=0, cols=max(map(len, rows)))
-                    table.style = 'Table Grid'
-                    for row in rows:
-                        cells = table.add_row().cells
-                        for cell, value in zip(cells, row):
-                            cell.text = value
-                for image in model.images:
-                    doc.add_picture(io.BytesIO(image), width=Cm(3))
+                append_page(doc, model, first=(index == 0))
                 progress('Word-dokumentum létrehozása…', index+1, len(pdf))
             if not any(p.text.strip() for p in doc.paragraphs) and not doc.tables:
                 raise ConversionError('Nem sikerült szerkeszthető szöveget kinyerni a dokumentumból.')

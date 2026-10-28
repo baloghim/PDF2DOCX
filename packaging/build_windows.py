@@ -85,7 +85,10 @@ def assemble(prefix, caches):
 
 def archive():
     folder = ROOT / 'dist' / 'PDF2DOCX'
-    (folder / 'BUILD-INFO.json').write_text(json.dumps({'source_commit': os.environ.get('GITHUB_SHA'), 'target': 'Windows x64', 'windows_1607_verified': False}, indent=2), encoding='utf-8')
+    import tomllib
+    project_file = ROOT / 'pyproject.toml'
+    app_version = tomllib.loads(project_file.read_text(encoding='utf-8'))['project']['version'] if project_file.exists() else 'unknown'
+    (folder / 'BUILD-INFO.json').write_text(json.dumps({'app_version': app_version, 'source_commit': os.environ.get('GITHUB_SHA'), 'target': 'Windows x64', 'windows_1607_verified': False}, indent=2), encoding='utf-8')
     for filename in ('README.md',):
         shutil.copy2(ROOT / filename, folder / filename)
     shutil.copy2(ROOT / 'packaging' / 'README.md', folder / 'WINDOWS-KIADAS.md')

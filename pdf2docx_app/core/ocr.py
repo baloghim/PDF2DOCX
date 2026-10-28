@@ -6,8 +6,10 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from statistics import median
 from PIL import Image, ImageOps
-from .model import ConversionError, Cancelled, Page, Paragraph, Run
+from .model import ConversionError, Cancelled, Page, Run
+from .layout import Line, bounds, paragraphs_from_blocks
 
 
 class Tesseract:
@@ -62,21 +64,42 @@ class Tesseract:
             image.save(source, dpi=(300, 300))
             text = self._run(args + [str(source), 'stdout'] + data_args +
                              ['-l', self.language, '--dpi', '300', '-c', 'tessedit_create_tsv=1'], cancel)
-        result = Page(ocr=True)
-        groups = {}
-        for row in csv.DictReader(io.StringIO(text), delimiter='\t', quoting=csv.QUOTE_NONE):
-            word = row.get('text', '').strip()
-            if row.get('level') != '5' or not word:
-                continue
-            try:
-                conf = float(row['conf'])
-            except (ValueError, KeyError):
-                conf = 0
-            result.uncertain_words += conf < 60
-            key = (row['block_num'], row['par_num'])
-            groups.setdefault(key, []).append(word)
-        for words in groups.values():
-            result.paragraphs.append(Paragraph([Run(' '.join(words))]))
-        if not result.paragraphs:
-            raise ConversionError('Az oldalról nem sikerült szöveget felismerni. Ellenőrizze a dokumentumot.')
-        return result
+        return parse_tsv(text, page.rect.width, page.rect.height, scale, (pix.x/scale, pix.y/scale))
+
+
+def parse_tsv(text, width, height, scale, origin=(0, 0)):
+    result = Page(ocr=True, width=width, height=height)
+    groups = {}
+    for row in csv.DictReader(io.StringIO(text), delimiter='\t', quoting=csv.QUOTE_NONE):
+        word = row.get('text', '').strip()
+        if row.get('level') != '5' or not word:
+            continue
+        try:
+            conf = float(row['conf'])
+        except (ValueError, KeyError):
+            conf = 0
+        result.uncertain_words += conf < 60
+        left, top, word_width, word_height = [float(row[k])/scale for k in ('left', 'top', 'width', 'height')]
+        box = (origin[0]+left, origin[1]+top, origin[0]+left+word_width, origin[1]+top+word_height)
+        paragraph_key = (row['block_num'], row['par_num'])
+        line_key = row['line_num']
+        groups.setdefault(paragraph_key, {}).setdefault(line_key, []).append((word, box))
+    blocks = []
+    for paragraph in groups.values():
+        lines = []
+        for words in paragraph.values():
+            box = bounds([b for _, b in words])
+            size = max(7, min(48, (box[3]-box[1])*1.15))
+            lines.append(Line([Run(' '.join(w for w,_ in words), size=size, font='Calibri')], box))
+        # Glyph boxes vary with accents and descenders; use one estimated size
+        # per OCR paragraph rather than inventing a font change on each line.
+        typical_size = median(line.size for line in lines)
+        for line in lines:
+            for run in line.runs:
+                run.size = typical_size
+        lines.sort(key=lambda line: (line.bbox[1], line.bbox[0]))
+        blocks.append(lines)
+    result.paragraphs = paragraphs_from_blocks(blocks, width)
+    if not result.paragraphs:
+        raise ConversionError('Az oldalról nem sikerült szöveget felismerni. Ellenőrizze a dokumentumot.')
+    return result

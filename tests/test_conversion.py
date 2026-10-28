@@ -41,7 +41,10 @@ def test_digital_unicode_multipage_and_source(tmp_path):
     result = convert(source, ocr=NoOCR())
     text = contents(result.path)
     assert TEXT in text
-    assert text.index('1. Első pont') < text.index('2. Második pont')
+    assert text.index('Első pont') < text.index('Második pont')
+    numbered = [p for p in Document(result.path).paragraphs if p.text in ('Első pont', 'Második pont')]
+    assert len(numbered) == 2
+    assert all(p._p.pPr.numPr is not None for p in numbered)
     assert result.pages == 3 and result.ocr_pages == 0
     assert hashlib.sha256(source.read_bytes()).digest() == before
     with zipfile.ZipFile(result.path) as docx:
