@@ -74,3 +74,16 @@ A build workflow tokenjének `contents: write` jogosultság szükséges a kiadá
 A [Windows build és közzététel sikeresen lefutott](https://github.com/baloghim/PDF2DOCX/actions/runs/40658728166);
 a ZIP a README-ből letölthető. A Windows Server 2022 teszt nem helyettesíti
 a kötelező Windows 1607 célgépes tesztet; ezt a kiadás előzetes jelölése is tükrözi.
+
+## Alkalmazáserőforrások
+
+A `pdf2docx_app/assets` könyvtár a PyInstaller-csomagba és a Python-csomagba is bekerül.
+Az OCR-mérethez és betűvastagsághoz a Carlito normál/félkövér referenciafontját
+használjuk, változtatás nélkül, a mellékelt SIL Open Font License 1.1 licenccel.
+Ezek nem kerülnek beágyazásra a felhasználó Word-dokumentumába; a kimenet Calibri
+betűtípust kér a Wordtől. A mérés teljesen helyben történik.
+
+Az egyéni ikon forrása `pdf2docx_app/assets/app.png`, Windows EXE-erőforrása
+`pdf2docx_app/assets/app.ico`. Ha rendelkezésre állnak, a GUI és a csomagoló ezeket
+használja. A felhasználó által a beszélgetésben megjelenített ikon eredeti fájlja
+még szükséges; ez a leírás nem állítja, hogy az ikon már a kiadás része.

@@ -21,6 +21,13 @@ def font_family(name, flags=0):
     return 'Courier New' if flags & 8 else ('Times New Roman' if flags & 4 else 'Calibri')
 
 
+def font_emphasis(name, flags=0):
+    name = name.lower()
+    bold = bool(flags & 16) or any(token in name for token in ('bold','demi')) or bool(re.search(r'(?:^|[-_, ])(?:black|heavy)(?:$|[-_, ])',name))
+    italic = bool(flags & 2) or any(token in name for token in ('italic','oblique'))
+    return bold, italic
+
+
 def extract(page):
     result = Page(width=page.rect.width, height=page.rect.height)
     try:
@@ -44,7 +51,7 @@ def extract(page):
                 box[1] <= (s['bbox'][1]+s['bbox'][3])/2 <= box[3] for box in result.table_boxes)]
             if not any(s['text'].strip() for s in spans):
                 continue
-            runs = [Run(s['text'], bool(s['flags'] & 16), bool(s['flags'] & 2),
+            runs = [Run(s['text'], *font_emphasis(s['font'],s['flags']),
                         s['size'], font_family(s['font'], s['flags']), s.get('color', 0), bool(s['flags'] & 1)) for s in spans]
             lines.append(Line(runs, tuple(line['bbox']), spans[0].get('origin', (0, line['bbox'][3]))[1]))
         if lines:

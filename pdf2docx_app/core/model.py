@@ -23,6 +23,7 @@ class Paragraph:
     body_left: float | None = None
     right_edge: float | None = None
     line_spacing: float = 1.05
+    line_height: float | None = None
 
     @property
     def text(self):

@@ -135,6 +135,16 @@ def archive():
     return output
 
 
+def prepare_icon():
+    from PIL import Image
+    png = ROOT / 'pdf2docx_app' / 'assets' / 'app.png'
+    ico = png.with_suffix('.ico')
+    if png.is_file():
+        with Image.open(png) as image:
+            image.convert('RGBA').save(ico,format='ICO',sizes=[(16,16),(24,24),(32,32),(48,48),(64,64),(128,128),(256,256)])
+    return ico if ico.is_file() else None
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--ocr-prefix', required=True, type=Path)
@@ -144,6 +154,7 @@ def main():
         raise SystemExit('This build must run on Windows.')
     info = json.loads(args.conda_info.read_text(encoding='utf-8-sig'))
     assemble(args.ocr_prefix, [Path(p) for p in info['pkgs_dirs']])
+    prepare_icon()
     subprocess.run([sys.executable, '-m', 'PyInstaller', '--clean', '--noconfirm', 'packaging/PDF2DOCX.spec'], cwd=ROOT, check=True)
     print(archive())
 

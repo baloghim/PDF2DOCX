@@ -2,7 +2,7 @@
 
 ## Windows-csomag letöltése
 
-**0.2.0 – formázásmegőrző frissítés.**
+**0.3.0 – javított OCR-méretbecslés, félkövérfelismerés és mindig felül ablak.**
 
 **[PDF2DOCX Windows x64 ZIP letöltése](https://github.com/baloghim/PDF2DOCX/releases/download/windows-preview/PDF2DOCX-Windows-x64.zip)**
 
@@ -26,7 +26,7 @@ adatbázis, külső OCR/API, telemetria vagy dokumentumfeltöltés.
 ## Használat
 
 Indítás → PDF behúzása (vagy kattintás a fogadóterületre) → feldolgozás → DOCX → OK.
-Egyszerre egy dokumentum fogadható. A cél azonos nevű `.docx`; meglévő fájlhoz
+Az alkalmazás ablaka mindig a többi ablak fölött marad. Egyszerre egy dokumentum fogadható. A cél azonos nevű `.docx`; meglévő fájlhoz
 felülírási engedély szükséges. Az új dokumentum ellenőrzött ideiglenes fájlból,
 atomikusan kerül a helyére; sikertelen mentés nem cseréli le a régi dokumentumot.
 Bezáráskor a feldolgozás megszakítható, az OCR-folyamat leáll, az átmeneti fájl törlődik.
@@ -78,9 +78,15 @@ A Windows build leírása: [packaging/README.md](packaging/README.md).
   Az egyéb listajelek és összetett számozások szövegként maradnak meg.
 - Az egyszerű rácsos táblák a megfelelő helyre kerülnek, oszlopszélességükkel együtt.
   A kis raszteres képek, logók a szöveghez viszonyított sorrendet és méretet követik.
-- Az OCR is felhasználja a felismert sorok és szavak helyét: igazítást, behúzást,
-  térközt és becsült betűméretet állít vissza. A szkennelt képből a betűcsalád,
-  félkövér/dőlt kiemelés és táblázatszerkezet jelenleg nem állítható vissza megbízhatóan.
+- A 0.3.0 OCR-je a szavak külön mért szélességéből és egy Calibrival méretkompatibilis,
+  szabad Carlito referenciafontból becsül méretet. A sor teljes magasságát nem használja
+  betűméretként: ezt a ferde szkennelés és az ékezetek félrevezetően megnövelhetik.
+  A hasonló méretek félpontos csoportokra egységesülnek, a sorköz pontban kerül átadásra.
+- A szkennelt képen a normál/félkövér referenciák betűfedettségének összehasonlításából
+  becsült félkövér szakaszok készülnek. Ez képi heurisztika, nem eredeti fontadat:
+  eltérő betűcsalád, rossz minőség, zaj vagy erős kontraszt esetén lehetnek tévesztések.
+  A felismert szöveget ez nem írja át. A dőlt kiemelés és a szkennelt táblázatszerkezet
+  továbbra sem állítható vissza megbízhatóan.
 - A formázás helyreállítása heurisztikus. Összetett hasábok, fejlécek/láblécek,
   vektoros grafikák, szegélyek és összetett táblák további kézi javítást igényelhetnek.
   A PDF-től eltérő Word-fontmetrikák miatt a tördelés és oldalszám eltérhet.

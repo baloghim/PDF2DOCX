@@ -125,7 +125,7 @@ def test_justified_body_keeps_its_width_below_wider_header(tmp_path):
         p.insert_textbox(pymupdf.Rect(400,40,545,75),'Header', align=2,fontsize=11)
         p.insert_textbox(pymupdf.Rect(70,120,460,400),
                          'alpha beta gamma delta epsilon zeta theta kappa lambda ' * 8,
-                         align=3,fontsize=12)
+                         align=3,fontsize=12,lineheight=1.25)
         pdf.save(path)
     doc = Document(convert(path).path)
     body = next(p for p in doc.paragraphs if p.text.startswith('alpha beta'))
@@ -133,3 +133,9 @@ def test_justified_body_keeps_its_width_below_wider_header(tmp_path):
     assert body.paragraph_format.right_indent.pt >= 80
     assert '\n' not in body.text
     assert body.text.count('alpha') == 8
+    with pymupdf.open(path) as pdf:
+        source_block = next(b for b in pdf[0].get_text('dict')['blocks'] if b['type']==0 and
+                            ''.join(s['text'] for s in b['lines'][0]['spans']).startswith('alpha'))
+        source_lines = source_block['lines']
+        baseline_gap = source_lines[1]['spans'][0]['origin'][1]-source_lines[0]['spans'][0]['origin'][1]
+    assert abs(body.paragraph_format.line_spacing.pt-baseline_gap) < .1

@@ -83,7 +83,7 @@ def append_page(doc, model, first=False):
             p = doc.add_paragraph(style='Heading 1' if paragraph.heading else None)
             fmt = p.paragraph_format
             fmt.space_before, fmt.space_after = Pt(gap), Pt(0)
-            fmt.line_spacing = paragraph.line_spacing
+            fmt.line_spacing = Pt(paragraph.line_height) if paragraph.line_height else paragraph.line_spacing
             fmt.keep_with_next = paragraph.heading
             fmt.widow_control = True
             p.alignment = ALIGN.get(paragraph.alignment, WD_ALIGN_PARAGRAPH.LEFT)

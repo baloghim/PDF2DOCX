@@ -10,6 +10,7 @@ from statistics import median
 from PIL import Image, ImageOps
 from .model import ConversionError, Cancelled, Page, Run
 from .layout import Line, bounds, paragraphs_from_blocks
+from .ocr_styles import estimate_styles
 
 
 class Tesseract:
@@ -64,12 +65,12 @@ class Tesseract:
             image.save(source, dpi=(300, 300))
             text = self._run(args + [str(source), 'stdout'] + data_args +
                              ['-l', self.language, '--dpi', '300', '-c', 'tessedit_create_tsv=1'], cancel)
-        return parse_tsv(text, page.rect.width, page.rect.height, scale, (pix.x/scale, pix.y/scale))
+        return parse_tsv(text, page.rect.width, page.rect.height, scale, (pix.x/scale, pix.y/scale), image=image, cancel=cancel)
 
 
-def parse_tsv(text, width, height, scale, origin=(0, 0)):
+def parse_tsv(text, width, height, scale, origin=(0, 0), *, image=None, cancel=None):
     result = Page(ocr=True, width=width, height=height)
-    groups = {}
+    records = []
     for row in csv.DictReader(io.StringIO(text), delimiter='\t', quoting=csv.QUOTE_NONE):
         word = row.get('text', '').strip()
         if row.get('level') != '5' or not word:
@@ -79,18 +80,30 @@ def parse_tsv(text, width, height, scale, origin=(0, 0)):
         except (ValueError, KeyError):
             conf = 0
         result.uncertain_words += conf < 60
-        left, top, word_width, word_height = [float(row[k])/scale for k in ('left', 'top', 'width', 'height')]
+        pixels = tuple(int(row[k]) for k in ('left','top','width','height'))
+        left, top, word_width, word_height = [v/scale for v in pixels]
         box = (origin[0]+left, origin[1]+top, origin[0]+left+word_width, origin[1]+top+word_height)
         paragraph_key = (row['block_num'], row['par_num'])
-        line_key = row['line_num']
-        groups.setdefault(paragraph_key, {}).setdefault(line_key, []).append((word, box))
+        line_key = paragraph_key + (row['line_num'],)
+        records.append(dict(text=word,pixels=pixels,box=box,confidence=conf,
+                            paragraph_key=paragraph_key,line_key=line_key))
+    styles = estimate_styles(records,image,scale,cancel) if image is not None else None
+    groups = {}
+    for i, record in enumerate(records):
+        size, bold = styles[i] if styles is not None else (None,False)
+        groups.setdefault(record['paragraph_key'],{}).setdefault(record['line_key'],[]).append(
+            (record['text'],record['box'],size,bold))
     blocks = []
     for paragraph in groups.values():
         lines = []
         for words in paragraph.values():
-            box = bounds([b for _, b in words])
-            size = max(7, min(48, (box[3]-box[1])*1.15))
-            lines.append(Line([Run(' '.join(w for w,_ in words), size=size, font='Calibri')], box))
+            box = bounds([b for _,b,_,_ in words])
+            # Geometry-only callers use median WORD height, never tilted line height.
+            estimates = [size for _,_,size,_ in words if size is not None]
+            size = median(estimates) if estimates else max(7,min(48,median(b[3]-b[1] for _,b,_,_ in words)*1.15))
+            runs = [Run((' ' if i else '')+word, bold=is_bold, size=size,font='Calibri')
+                    for i,(word,_,_,is_bold) in enumerate(words)]
+            lines.append(Line(runs,box))
         # Glyph boxes vary with accents and descenders; use one estimated size
         # per OCR paragraph rather than inventing a font change on each line.
         typical_size = median(line.size for line in lines)

@@ -1,5 +1,5 @@
 """Geometry-based paragraph reconstruction shared by PDF and OCR extraction."""
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from statistics import median
 import re
 from .model import Paragraph, Run
@@ -66,7 +66,7 @@ def paragraphs_from_blocks(blocks, page_width):
                         p.runs[-1].text = p.runs[-1].text[:-1]
                     else:
                         wrap = ((width >= page_width*.45 and previous.bbox[2]-previous.bbox[0] >= width*.72) or (len(group) <= 2 and p.alignment == 'left' and not p.heading and not p.list_item))
-                        p.runs.append(Run(' ' if wrap else '\n'))
+                        p.runs.append(replace(p.runs[-1],text=' ' if wrap else '\n'))
                 p.runs.extend(line.runs)
             if len(group) > 1:
                 if width >= page_width*.45:
@@ -75,6 +75,9 @@ def paragraphs_from_blocks(blocks, page_width):
                 p.first_line_indent = group[0].bbox[0]-rest_left
                 p.body_left = rest_left
                 intervals = [(b.baseline or b.bbox[3])-(a.baseline or a.bbox[3]) for a,b in zip(group,group[1:])]
+                positive_intervals = [v for v in intervals if v > 0]
+                if positive_intervals:
+                    p.line_height = max(max(line.size for line in group)*1.1, median(positive_intervals))
                 factors = [v / max(body_size, 1) for v in intervals if v > 0]
                 p.line_spacing = max(1, min(1.8, median(factors))) if factors else 1
             else:

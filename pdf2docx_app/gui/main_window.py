@@ -6,6 +6,7 @@ import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 from ..core.converter import convert, validate_input
 from ..core.model import ConversionError, Cancelled
+from ..resources import asset_path
 
 
 class Application:
@@ -24,6 +25,16 @@ class Application:
             self.root = tk.Tk()
             self.dnd = None
         self.root.title('PDF2DOCX')
+        self.root.attributes('-topmost', True)
+        icon = asset_path('app.png')
+        self.app_icon = tk.PhotoImage(file=str(icon)) if icon.is_file() else None
+        self.drop_icon = self.app_icon.subsample(max(1,self.app_icon.width()//48)) if self.app_icon is not None else None
+        if self.app_icon is not None:
+            self.root.iconphoto(True, self.app_icon)
+        if os.name == 'nt':
+            ico = asset_path('app.ico')
+            if ico.is_file():
+                self.root.iconbitmap(str(ico))
         w, h = 500, 300
         self.root.geometry(f'{w}x{h}+{(self.root.winfo_screenwidth()-w)//2}+{(self.root.winfo_screenheight()-h)//2}')
         self.root.minsize(450, 280)
@@ -53,7 +64,10 @@ class Application:
         c.delete('all')
         w, h = c.winfo_width(), c.winfo_height()
         c.create_rectangle(3, 3, w-3, h-3, dash=(6, 4), outline='#8a9bb0', width=2, tags='border')
-        c.create_text(w/2, h/2-25, text='▤', font=('Segoe UI', 30), fill='#3565a1')
+        if self.drop_icon is not None:
+            c.create_image(w/2,h/2-25,image=self.drop_icon)
+        else:
+            c.create_text(w/2, h/2-25, text='▤', font=('Segoe UI', 30), fill='#3565a1')
         c.create_text(w/2, h/2+25, text='Konvertálás folyamatban…' if self.busy else 'Húzza ide a konvertálandó PDF-fájlt!', font=('Segoe UI', 13), width=w-24, justify='center')
 
     def highlight(self, active):
@@ -78,6 +92,7 @@ class Application:
     def confirm_overwrite(self):
         dialog = tk.Toplevel(self.root)
         dialog.title('PDF2DOCX')
+        dialog.attributes('-topmost', True)
         dialog.transient(self.root)
         dialog.resizable(False, False)
         ttk.Label(dialog, text='Ebben a mappában már létezik ilyen nevű Word-dokumentum.\nSzeretné felülírni?', padding=20).pack()

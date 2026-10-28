@@ -12,6 +12,8 @@ for item in required:
     if not (ocr / item).exists():
         raise SystemExit(f'Missing vetted OCR redistribution resource: {item}')
 datas, binaries, hiddenimports = collect_all('tkinterdnd2')
+datas.append((str(root / 'pdf2docx_app' / 'assets'), 'pdf2docx_app/assets'))
+app_icon = root / 'pdf2docx_app' / 'assets' / 'app.ico'
 # Include every native OCR dependency from the vetted portable distribution.
 for item in ocr.rglob('*'):
     if item.is_file():
@@ -24,5 +26,6 @@ a = Analysis([str(root / 'main.py')], pathex=[str(root)], binaries=binaries,
              datas=datas, hiddenimports=hiddenimports, noarchive=False)
 pyz = PYZ(a.pure)
 exe = EXE(pyz, a.scripts, [], exclude_binaries=True, name='PDF2DOCX',
-          debug=False, strip=False, upx=False, console=False, uac_admin=False)
+          debug=False, strip=False, upx=False, console=False, uac_admin=False,
+          icon=str(app_icon) if app_icon.exists() else None)
 coll = COLLECT(exe, a.binaries, a.datas, strip=False, upx=False, name='PDF2DOCX')
