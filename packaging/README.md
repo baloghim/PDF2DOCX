@@ -71,7 +71,7 @@ a magyar OCR-t. Ekkor a fejlesztői Python/OCR elérési útjai nem használhat�
 Csak sikeres build és tesztek után kerülnek a fájlok a `windows-preview`
 előzetes GitHub Release mellékletei közé. A README állandó letöltési linkje ide mutat.
 A build workflow tokenjének `contents: write` jogosultság szükséges a kiadási jobban.
-A [Windows build és közzététel sikeresen lefutott](https://github.com/baloghim/PDF2DOCX/actions/runs/40658728166);
+A [Windows build és közzététel sikeresen lefutott](https://github.com/baloghim/PDF2DOCX/actions/runs/40664761827);
 a ZIP a README-ből letölthető. A Windows Server 2022 teszt nem helyettesíti
 a kötelező Windows 1607 célgépes tesztet; ezt a kiadás előzetes jelölése is tükrözi.
 
@@ -87,3 +87,8 @@ Az egyéni ikon forrása `pdf2docx_app/assets/app.png`, Windows EXE-erőforrása
 `pdf2docx_app/assets/app.ico`. Ha rendelkezésre állnak, a GUI és a csomagoló ezeket
 használja. A felhasználó által a beszélgetésben megjelenített ikon eredeti fájlja
 még szükséges; ez a leírás nem állítja, hogy az ikon már a kiadás része.
+
+A kért ikon forrásoldala: https://www.flaticon.com/free-icon/pdf-file-format_15266827 .
+A forrás jelenleg nincs az engedélyezett futásidejű hálózati domainek között, ezért
+a kép és a pontos névfeltüntetési feltételek letöltése még függőben van.
+A saját ikon nem része a 0.3.0 ZIP-nek.
