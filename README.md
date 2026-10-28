@@ -93,8 +93,8 @@ csak hibakategória és időpont kerül bele, dokumentumszöveg, útvonal, OCR s
 .venv/bin/python -m pytest -q
 ```
 
-Az integrációs tesztek valódi Tesseractot, `hun`+`eng` nyelvet és DejaVu Sans
-betűtípust használnak. A személyes adat nélküli PDF-ek futáskor készülnek.
+Az integrációs tesztek valódi Tesseractot, `hun`+`eng` nyelvet és a repositoryban mellékelt DejaVu Sans
+betűtípust használják (`tests/assets`, licenccel együtt). A személyes adat nélküli PDF-ek futáskor készülnek.
 A tesztfont helyét a `PDF2DOCX_TEST_FONT` környezeti változóval lehet megadni.
 Szöveges/többoldalas/vegyes PDF, magyar ékezetek, számozás, szerkeszthető DOCX,
 forrás hash, jelszó, hibás bemenet, mentési hiba, felülírás, versenyhelyzet,

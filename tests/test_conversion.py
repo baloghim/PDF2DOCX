@@ -13,7 +13,7 @@ from pdf2docx_app.core.model import ConversionError, Cancelled
 from pdf2docx_app.core.ocr import Tesseract
 
 TEXT = 'Árvíztűrő tükörfúrógép. Ügyiratszám: AB-123/2026.'
-FONT = os.environ.get('PDF2DOCX_TEST_FONT', '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf')
+FONT = os.environ.get('PDF2DOCX_TEST_FONT', str(Path(__file__).parent / 'assets' / 'DejaVuSans.ttf'))
 
 
 def make_pdf(path, texts=(TEXT,)):
