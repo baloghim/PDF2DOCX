@@ -27,18 +27,33 @@ def assemble(prefix, caches):
         raise RuntimeError('OCR staging directory already exists; use a clean checkout.')
     destination.mkdir()
     binaries = prefix / 'Library' / 'bin'
-    for path in binaries.iterdir():
-        if path.suffix.lower() == '.dll' or path.name.lower() == 'tesseract.exe':
-            shutil.copy2(path, destination / path.name)
-    if not (destination / 'tesseract.exe').is_file():
-        raise RuntimeError('Conda environment does not contain tesseract.exe')
+    # Bundle the PE dependency closure, not unrelated DLLs from the conda Python.
+    import pefile
+    available = {p.name.lower(): p for p in binaries.iterdir() if p.is_file()}
+    selected = set()
+    pending = ['tesseract.exe']
+    while pending:
+        name = pending.pop().lower()
+        if name in selected:
+            continue
+        if name not in available:
+            raise RuntimeError(f'Missing OCR binary: {name}')
+        selected.add(name)
+        path = available[name]
+        with pefile.PE(str(path), fast_load=True) as pe:
+            pe.parse_data_directories(directories=[pefile.DIRECTORY_ENTRY['IMAGE_DIRECTORY_ENTRY_IMPORT'], pefile.DIRECTORY_ENTRY['IMAGE_DIRECTORY_ENTRY_DELAY_IMPORT']])
+            for entry in list(getattr(pe, 'DIRECTORY_ENTRY_IMPORT', [])) + list(getattr(pe, 'DIRECTORY_ENTRY_DELAY_IMPORT', [])):
+                dependency = entry.dll.decode('ascii').lower()
+                if dependency in available and dependency not in selected:
+                    pending.append(dependency)
+        shutil.copy2(path, destination / path.name)
     licenses = destination / 'LICENSES'
     licenses.mkdir()
     manifest = []
     for metadata in sorted((prefix / 'conda-meta').glob('*.json')):
         package = json.loads(metadata.read_text(encoding='utf-8'))
         # Only packages contributing files to the redistributed binary directory.
-        if not any(f.lower().startswith('library/bin/') and f.lower().endswith(('.dll', '/tesseract.exe')) for f in package.get('files', [])):
+        if not any(f.lower().startswith('library/bin/') and f.rsplit('/', 1)[-1].lower() in selected for f in package.get('files', [])):
             continue
         key = metadata.stem
         found = False
@@ -78,6 +93,17 @@ def archive():
     import importlib.metadata
     notices = folder / 'LICENSES' / 'python-packages'
     notices.mkdir(parents=True, exist_ok=True)
+    if sys.platform == 'win32':
+        python_root = Path(sys.base_prefix)
+        required_notices = {
+            'Python-LICENSE.txt': python_root / 'LICENSE.txt',
+            'Tcl-license.terms': python_root / 'tcl' / 'tcl8.6' / 'license.terms',
+            'Tk-license.terms': python_root / 'tcl' / 'tk8.6' / 'license.terms',
+        }
+        for name, source in required_notices.items():
+            if not source.is_file():
+                raise RuntimeError(f'Missing Python/Tk redistribution license: {name}')
+            shutil.copy2(source, notices.parent / name)
     for dist in importlib.metadata.distributions():
         for item in dist.files or []:
             if '.dist-info/' in str(item) and any(x in item.name.lower() for x in ('license', 'copying', 'notice', 'metadata')):
