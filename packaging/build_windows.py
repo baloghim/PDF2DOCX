@@ -100,10 +100,25 @@ def archive():
             'Tcl-license.terms': python_root / 'tcl' / 'tcl8.6' / 'license.terms',
             'Tk-license.terms': python_root / 'tcl' / 'tk8.6' / 'license.terms',
         }
+        import tkinter
+        tk = tkinter.Tk()
+        tk.withdraw()
+        try:
+            versions = {'Tcl-license.terms': ('tcl', tk.tk.call('info', 'patchlevel')),
+                        'Tk-license.terms': ('tk', tk.tk.call('package', 'provide', 'Tk'))}
+        finally:
+            tk.destroy()
         for name, source in required_notices.items():
-            if not source.is_file():
-                raise RuntimeError(f'Missing Python/Tk redistribution license: {name}')
-            shutil.copy2(source, notices.parent / name)
+            if source.is_file():
+                shutil.copy2(source, notices.parent / name)
+            elif name in versions:
+                component, version = versions[name]
+                tag = 'core-' + str(version).replace('.', '-')
+                url = f'https://raw.githubusercontent.com/tcltk/{component}/{tag}/license.terms'
+                with urllib.request.urlopen(url, timeout=60) as response:
+                    (notices.parent / name).write_bytes(response.read())
+            else:
+                raise RuntimeError(f'Missing Python redistribution license: {name}')
     for dist in importlib.metadata.distributions():
         for item in dist.files or []:
             if '.dist-info/' in str(item) and any(x in item.name.lower() for x in ('license', 'copying', 'notice', 'metadata')):
