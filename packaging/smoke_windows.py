@@ -21,9 +21,9 @@ with tempfile.TemporaryDirectory(prefix='PDF2DOCX ZIP teszt ') as tmp:
     environment['PATH'] = os.path.join(os.environ['WINDIR'], 'System32')
     executable = tmp / 'PDF2DOCX' / 'PDF2DOCX.exe'
     result = subprocess.run([str(executable), '--verify-runtime', str(report)], env=environment, cwd=tmp, timeout=180)
-    if result.returncode or not report.exists():
+    if not report.exists():
         raise SystemExit('Packaged executable verification failed')
     data = json.loads(report.read_text(encoding='utf-8'))
-    if not data.get('ok'):
+    if result.returncode or not data.get('ok'):
         raise SystemExit(f'Packaged verification failed: {data}')
     print('Packaged EXE: TkDnD, digital PDF and Hungarian OCR passed.')

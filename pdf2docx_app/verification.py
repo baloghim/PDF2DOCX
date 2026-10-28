@@ -45,5 +45,6 @@ def verify(report):
         result = {'ok': True, 'native_tkdnd': True, 'digital_pdf': True, 'hungarian_ocr': True}
     except Exception as error:
         result['error_category'] = type(error).__name__
+        result['error_message'] = str(error)
     Path(report).write_text(json.dumps(result), encoding='utf-8')
     return 0 if result['ok'] else 1

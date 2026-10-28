@@ -47,9 +47,7 @@ jobs:
           $env:PATH = "$pwd\packaging\ocr;$env:PATH"
           $env:TESSDATA_PREFIX = "$pwd\packaging\ocr\tessdata"
           $env:PDF2DOCX_TEST_FONT = "$env:WINDIR\Fonts\arial.ttf"
-          & "$env:pythonLocation\python.exe" -m pytest -q
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          & "$env:pythonLocation\python.exe" packaging/smoke_windows.py
+          & "$env:pythonLocation\python.exe" packaging/test_windows.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - uses: actions/upload-artifact@v4
         with:
