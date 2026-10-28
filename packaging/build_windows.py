@@ -109,6 +109,8 @@ if __name__ == '__main__':
         main()
     except Exception:
         # This build uses only public dependencies, no user documents or secrets.
+        message = traceback.format_exc().replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
+        print('::error title=Windows packaging failure::' + message, flush=True)
         summary = os.environ.get('GITHUB_STEP_SUMMARY')
         if summary:
             with open(summary, 'a', encoding='utf-8') as report:
