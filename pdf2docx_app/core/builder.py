@@ -90,6 +90,8 @@ def append_page(doc, model, first=False):
             if box and paragraph.alignment in ('left', 'justify'):
                 fmt.left_indent = Pt(max(0, (paragraph.body_left if paragraph.body_left is not None else box[0])-margin_left))
                 fmt.first_line_indent = Pt(paragraph.first_line_indent)
+                if paragraph.right_edge is not None:
+                    fmt.right_indent = Pt(max(0, model.width-margin_right-paragraph.right_edge))
             runs = paragraph.runs
             marker = MARKER.match(paragraph.text) if paragraph.list_item else None
             if marker:

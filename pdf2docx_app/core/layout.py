@@ -57,7 +57,7 @@ def paragraphs_from_blocks(blocks, page_width):
                 p.alignment = 'center'
             elif all(abs(line.bbox[2]-body_right) < 10 for line in group) and box[0] > body_left+body_width*.4 and width < body_width*.7:
                 p.alignment = 'right'
-            elif len(group) >= 3 and width >= body_width*.8 and all(abs(line.bbox[2]-body_right) < 10 for line in group[:-1]):
+            elif len(group) >= 3 and width >= body_width*.8 and all(abs(line.bbox[2]-box[2]) < 10 for line in group[:-1]):
                 p.alignment = 'justify'
             for index, line in enumerate(group):
                 if index:
@@ -69,6 +69,8 @@ def paragraphs_from_blocks(blocks, page_width):
                         p.runs.append(Run(' ' if wrap else '\n'))
                 p.runs.extend(line.runs)
             if len(group) > 1:
+                if width >= page_width*.45:
+                    p.right_edge = box[2]
                 rest_left = median(line.bbox[0] for line in group[1:])
                 p.first_line_indent = group[0].bbox[0]-rest_left
                 p.body_left = rest_left

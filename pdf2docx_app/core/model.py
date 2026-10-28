@@ -21,6 +21,7 @@ class Paragraph:
     alignment: str = "left"
     first_line_indent: float = 0
     body_left: float | None = None
+    right_edge: float | None = None
     line_spacing: float = 1.05
 
     @property

@@ -116,3 +116,20 @@ def test_short_address_lines_are_kept_without_text_boxes(tmp_path):
     doc = Document(convert(path).path)
     assert any(p.text == 'Recipient\nTown name\nStreet address' for p in doc.paragraphs)
     assert not doc.element.xpath('.//w:txbxContent')
+
+
+def test_justified_body_keeps_its_width_below_wider_header(tmp_path):
+    path = tmp_path/'justified.pdf'
+    with pymupdf.open() as pdf:
+        p = pdf.new_page(width=595,height=842)
+        p.insert_textbox(pymupdf.Rect(400,40,545,75),'Header', align=2,fontsize=11)
+        p.insert_textbox(pymupdf.Rect(70,120,460,400),
+                         'alpha beta gamma delta epsilon zeta theta kappa lambda ' * 8,
+                         align=3,fontsize=12)
+        pdf.save(path)
+    doc = Document(convert(path).path)
+    body = next(p for p in doc.paragraphs if p.text.startswith('alpha beta'))
+    assert body.alignment == WD_ALIGN_PARAGRAPH.JUSTIFY
+    assert body.paragraph_format.right_indent.pt >= 80
+    assert '\n' not in body.text
+    assert body.text.count('alpha') == 8
