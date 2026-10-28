@@ -1,8 +1,14 @@
 """Run Windows release checks and expose actionable public annotations."""
 from pathlib import Path
 import subprocess
+import os
+import traceback
 import sys
 import xml.etree.ElementTree as ET
+
+sys.stdout.reconfigure(encoding='utf-8', errors='backslashreplace')
+sys.stderr.reconfigure(encoding='utf-8', errors='backslashreplace')
+os.environ['PYTHONIOENCODING'] = 'utf-8'
 
 
 def annotation(message):
@@ -31,4 +37,9 @@ def main():
 
 
 if __name__ == '__main__':
-    raise SystemExit(main())
+    try:
+        code = main()
+    except Exception:
+        annotation(traceback.format_exc())
+        code = 1
+    raise SystemExit(code)
