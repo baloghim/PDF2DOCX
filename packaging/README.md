@@ -71,6 +71,6 @@ a magyar OCR-t. Ekkor a fejlesztői Python/OCR elérési útjai nem használhat�
 Csak sikeres build és tesztek után kerülnek a fájlok a `windows-preview`
 előzetes GitHub Release mellékletei közé. A README állandó letöltési linkje ide mutat.
 A build workflow tokenjének `contents: write` jogosultság szükséges a kiadási jobban.
-A [Windows build és közzététel sikeresen lefutott](https://github.com/baloghim/PDF2DOCX/actions/runs/40654527102);
+A [Windows build és közzététel sikeresen lefutott](https://github.com/baloghim/PDF2DOCX/actions/runs/40658728166);
 a ZIP a README-ből letölthető. A Windows Server 2022 teszt nem helyettesíti
 a kötelező Windows 1607 célgépes tesztet; ezt a kiadás előzetes jelölése is tükrözi.

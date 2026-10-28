@@ -2,6 +2,8 @@
 
 ## Windows-csomag letöltése
 
+**0.2.0 – formázásmegőrző frissítés.**
+
 **[PDF2DOCX Windows x64 ZIP letöltése](https://github.com/baloghim/PDF2DOCX/releases/download/windows-preview/PDF2DOCX-Windows-x64.zip)**
 
 A teljes, OCR-motort és magyar nyelvi adatokat is tartalmazó csomag körülbelül **57 MB**.
@@ -117,8 +119,8 @@ A virtuális Linux kijelzőn a GUI munkafolyamata tesztelt. A TkDnD natív betö
 a hordozható Linux Tcl környezetben nem működött, ezért Linuxon kizárólag
 a kattintásos fájlválasztó aktív. A drag-and-drop natív része Windowsra korlátozott;
 a fájllista és drop-esemény kezelése automatikusan tesztelt.
-A [sikeres Windows Server 2022 buildben](https://github.com/baloghim/PDF2DOCX/actions/runs/40654527102)
-16 automatizált teszt, valamint a ZIP-ből kibontott EXE natív TkDnD-, digitális PDF-
+A [sikeres Windows Server 2022 buildben](https://github.com/baloghim/PDF2DOCX/actions/runs/40658728166)
+22 automatizált teszt, valamint a ZIP-ből kibontott EXE natív TkDnD-, digitális PDF-
 és magyar OCR-ellenőrzése is sikerült.
 Az Intézőből történő tényleges behúzás kézi tesztje és a Windows 10 Enterprise
 2016 LTSB 1607 build 14393.9512 kompatibilitási teszt továbbra is hátravan.
